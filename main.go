@@ -13,7 +13,9 @@ import (
 
 func main() {
 	//f, err := os.Open("/home/gnewton/Downloads/repository_metadata_2013-12-12_127.json")
-	f, err := os.Open("/run/media/gnewton/NewtonNTFS/data/json/metadata/repository_metadata_2013-12-16_143.json")
+	//f, err := os.Open("/run/media/gnewton/NewtonNTFS/data/json/metadata/repository_metadata_2013-12-16_143.json")
+	f, err := os.Open("/run/media/gnewton/NewtonNTFS/data/json/metadata/repository_metadata_2014-06-06_150.json")
+	//f, err := os.Open("/tmp/a.json")
 	if err != nil {
 		log.Fatal(err)
 	}
