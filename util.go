@@ -4,11 +4,16 @@ import (
 	"bufio"
 	"compress/bzip2"
 	"compress/gzip"
+	"errors"
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
+
+const GZIP_SUFFIX = ".gz"
+const BZIP2_SUFFIX = ".bz2"
 
 func genericReader(fileName string) (*bufio.Reader, error) {
 	var reader io.Reader
@@ -16,16 +21,35 @@ func genericReader(fileName string) (*bufio.Reader, error) {
 	var f *os.File = nil
 
 	if fileName == "" {
-		log.Println("Reading from stdin")
+		if VERBOSE {
+			log.Println("Reading from stdin")
+		}
 		return bufio.NewReader(os.Stdin), nil
 	} else {
+		if VERBOSE {
+			log.Println("Opening: " + fileName)
+		}
 		f, err = os.Open(fileName)
 		if err != nil {
 			log.Println(err)
 			return nil, err
 		}
 
-		if strings.HasSuffix(fileName, ".gz") {
+		fileInfo, err := f.Stat()
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		if fileInfo.Size() == 0 {
+			return nil, errors.New("File is size 0 bytes")
+		}
+
+		if VERBOSE {
+			log.Println(" File size: " + strconv.FormatInt(fileInfo.Size(), 10))
+		}
+
+		if strings.HasSuffix(fileName, GZIP_SUFFIX) {
 			reader, err = gzip.NewReader(f)
 			if err != nil {
 				log.Println(err)
@@ -33,14 +57,13 @@ func genericReader(fileName string) (*bufio.Reader, error) {
 			}
 
 		} else {
-			if strings.HasSuffix(fileName, ".bz2") {
+			if strings.HasSuffix(fileName, BZIP2_SUFFIX) {
 				reader = bzip2.NewReader(f)
 			} else {
 				reader = f
 			}
 		}
 
-		log.Println("Opening: " + fileName)
 		return bufio.NewReader(reader), nil
 	}
 

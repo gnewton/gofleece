@@ -18,13 +18,16 @@ func handleParameters() error {
 	return nil
 }
 
-var DEBUG bool
+var STOP_ON_ERROR bool = false
+var VERBOSE bool = false
 
 func init() {
-	flag.BoolVar(&DEBUG, "d", DEBUG, "Debug; prints out much information")
+	flag.BoolVar(&STOP_ON_ERROR, "s", STOP_ON_ERROR, "Stop if error encountered")
+	flag.BoolVar(&VERBOSE, "v", VERBOSE, "Verbosity of logging")
 }
 
 func main() {
+	var fileNames = []string{""}
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	err := handleParameters()
 	if err != nil {
@@ -32,33 +35,59 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var fileName string
-	if len(flag.Args()) > 0 {
-		fileName = flag.Args()[0]
+	if len(flag.Args()) != 0 {
+		fileNames = flag.Args()
 	}
 
-	//fileName := "/run/media/gnewton/NewtonNTFS/data/json/metadata/repository_metadata_2014-06-06_150.json"
-	//fileName := "repository_metadata_2014-06-06_150.json.bz2"
-	//f, err := os.Open("/home/gnewton/Downloads/repository_metadata_2013-12-12_127.json")
-	//f, err := os.Open("/run/media/gnewton/NewtonNTFS/data/json/metadata/repository_metadata_2013-12-16_143.json")
-	//f, err := os.Open("/tmp/a.json")
-	//msg := "{\"assets\" : {\"old\" : 123}, \"foo\":[1,2,3], \"person\":{\"age\":27, \"sex\":\"m\"}, \"smith\": 56}"
+	for _, fileName := range fileNames {
+		err = verifyJson(fileName)
 
+		if err != nil {
+			log.Println(fileName)
+			log.Println(" ERROR")
+			log.Println(err)
+			if STOP_ON_ERROR {
+				log.Fatal()
+			}
+		} else {
+			if VERBOSE {
+				log.Println("Valid JSON")
+			}
+		}
+		if VERBOSE {
+			log.Println("------------------")
+		}
+	}
+}
+
+func verifyJson(fileName string) error {
 	jsonStream, err := genericReader(fileName)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	prefix, err := jsonStream.Peek(128)
 	if err != nil {
 		if err != bufio.ErrBufferFull {
-			//log.Fatal(err)
+			return err
 		}
+
 	}
+
+	return parseJson(prefix, jsonStream)
+}
+
+func parseJson(prefix []byte, jsonReader *bufio.Reader) error {
 	if jsonHasLeadingSquareBrace(string(prefix)) {
-		err = isValidArray(jsonStream)
+		if VERBOSE {
+			log.Println("Array")
+		}
+		return isValidArray(jsonReader)
 	} else {
-		err = isValidMap(jsonStream)
+		if VERBOSE {
+			log.Println("Map")
+		}
+		return isValidMap(jsonReader)
 	}
 }
 
@@ -71,6 +100,7 @@ func isValidJson(r *bufio.Reader) error {
 	if err != nil {
 		if err != bufio.ErrBufferFull && err != io.EOF {
 			log.Println(err)
+			return err
 		}
 	}
 	if jsonHasLeadingSquareBrace(string(prefix)) {
@@ -98,7 +128,6 @@ func isValidMap(r *bufio.Reader) error {
 			if err == io.EOF {
 				return nil
 			} else {
-				log.Println(err)
 				return err
 			}
 		}
@@ -120,7 +149,6 @@ func isValidArray(r *bufio.Reader) error {
 			if err == io.EOF {
 				return nil
 			} else {
-				log.Println(err)
 				return err
 			}
 		}
