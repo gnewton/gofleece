@@ -37,7 +37,7 @@ const validJsonMap1 = `
 }`
 
 // from http://www.sitepoint.com/google-maps-json-file/
-// Removed "point":new GLatLng(40.266044,-74.718479),
+// Removed multiple point, like "point":new GLatLng(40.266044,-74.718479),
 // Removed trailing comma after last entry
 const google_maps_json_file = `{"markers": [
         {
@@ -106,7 +106,7 @@ const colors_json_file = `{"markers": [
 `
 
 // From http://www.sitepoint.com/twitter-json-example/
-// backslashed quotes in source url
+// escaped (backslashed) quotes in source url
 const twitter_json = `{"results":[
      {"text":"@twitterapi  http://tinyurl.com/ctrefg",
      "to_user_id":396524,

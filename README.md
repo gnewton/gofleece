@@ -13,3 +13,8 @@ Usage of ./gofleece:
 * Raw json, gzipped and bzip2ed files transparently processed
 * Default only complains about failures
 * Default does not stop when a json file fails
+* Handles very large json files with minumal overhead
+** Tested with 2GB JSON file, 11GB resident, 13GB virtual
+
+## TODO
+* Presently single threaded: goroutine per file to be validated (limit to max cores; make # routines configuratble).
