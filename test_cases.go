@@ -1,5 +1,8 @@
 package main
 
+const smallestValidJsonMap = `{}`
+const smallestValidJsonArray = `[]`
+
 const validJsonArray0 = `
     [
    {
@@ -186,6 +189,6 @@ const youtube_json = `{"apiVersion":"2.0",
  }
 }`
 
-var validMaps = []string{validJsonMap0, validJsonMap1, google_maps_json_file, colors_json_file, twitter_json, youtube_json}
+var validMaps = []string{smallestValidJsonMap, validJsonMap0, validJsonMap1, google_maps_json_file, colors_json_file, twitter_json, youtube_json}
 
-var validArrays = []string{validJsonArray0}
+var validArrays = []string{smallestValidJsonArray, validJsonArray0}
