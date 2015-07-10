@@ -27,6 +27,7 @@ func init() {
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	var fileNames = []string{""}
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	err := handleParameters()
@@ -41,10 +42,7 @@ func main() {
 
 	for _, fileName := range fileNames {
 		err = verifyJson(fileName)
-
 		if err != nil {
-			log.Println(fileName)
-			log.Println(" ERROR")
 			log.Println(err)
 			if STOP_ON_ERROR {
 				log.Fatal()
@@ -63,12 +61,15 @@ func main() {
 func verifyJson(fileName string) error {
 	jsonStream, err := genericReader(fileName)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
 	prefix, err := jsonStream.Peek(128)
 	if err != nil {
-		if err != bufio.ErrBufferFull {
+		if err != bufio.ErrBufferFull && err != io.EOF {
+			log.Println(err)
+			log.Println("FFFF")
 			return err
 		}
 
@@ -99,9 +100,11 @@ func isValidJson(r *bufio.Reader) error {
 	prefix, err = r.Peek(128)
 	if err != nil {
 		if err != bufio.ErrBufferFull && err != io.EOF {
+			log.Println("Error testing isValidJson")
 			log.Println(err)
 			return err
 		}
+
 	}
 	if jsonHasLeadingSquareBrace(string(prefix)) {
 		err = isValidArray(r)
@@ -128,6 +131,7 @@ func isValidMap(r *bufio.Reader) error {
 			if err == io.EOF {
 				return nil
 			} else {
+
 				return err
 			}
 		}

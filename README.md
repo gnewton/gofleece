@@ -14,28 +14,45 @@ Usage of ./gofleece:
 * Default: only complains about failures
 * Default: does not stop when a json file fails
 * Handles very large json files with minumal overhead
-* Tested with 2GB JSON file, 11GB resident, 13GB virtual
+* Tested with 2GB JSON file, 9MB virtual, 3.6MB resident.
 
 ## TODO
 * Presently single threaded: goroutine per file to be validated (limit to max cores; make # routines configuratble)
 
 ## Example
 ```
-$ ./gofleece -v *json*
-2015/07/09 17:10:11 Opening: repository_metadata_2014-06-06_150.json.bz2
-2015/07/09 17:10:11  File size: 454545326
-2015/07/09 17:10:11 Map
-2015/07/09 17:23:22 Valid JSON
-2015/07/09 17:23:22 ------------------
-2015/07/09 17:23:22 Opening: repository_metadata_2014-06-09_237.json
-2015/07/09 17:23:22  File size: 204
-2015/07/09 17:23:22 Map
-2015/07/09 17:23:22 Valid JSON
-2015/07/09 17:23:22 ------------------
-2015/07/09 17:23:22 Opening: repository_metadata_2014-06-10_357.json
-2015/07/09 17:23:22  File size: 506957
-2015/07/09 17:23:22 Map
-2015/07/09 17:23:22 Valid JSON
-2015/07/09 17:23:22 ------------------
+$ /usr/bin/time -f "%E %M" ./gofleece -v *.json
+2015/07/09 23:05:22 util.go:30: Opening: repository_metadata_2014-06-06_150.json
+2015/07/09 23:05:22 util.go:49:  File size: 2080284113
+2015/07/09 23:05:22 main.go:92: Map
+2015/07/09 23:06:47 main.go:45: #######################
+2015/07/09 23:06:47 main.go:55: Valid JSON
+2015/07/09 23:06:47 main.go:59: ------------------
+2015/07/09 23:06:47 util.go:30: Opening: repository_metadata_2014-06-09_237.json
+2015/07/09 23:06:47 util.go:49:  File size: 204
+2015/07/09 23:06:47 main.go:92: Map
+2015/07/09 23:06:47 main.go:45: #######################
+2015/07/09 23:06:47 main.go:55: Valid JSON
+2015/07/09 23:06:47 main.go:59: ------------------
+2015/07/09 23:06:47 util.go:30: Opening: repository_metadata_2014-06-10_357.json
+2015/07/09 23:06:47 util.go:49:  File size: 506957
+2015/07/09 23:06:47 main.go:92: Map
+2015/07/09 23:06:47 main.go:45: #######################
+2015/07/09 23:06:47 main.go:55: Valid JSON
+2015/07/09 23:06:47 main.go:59: ------------------
+2015/07/09 23:06:47 util.go:30: Opening: smallest_array.json
+2015/07/09 23:06:47 util.go:49:  File size: 3
+2015/07/09 23:06:47 main.go:87: Array
+2015/07/09 23:06:47 main.go:45: #######################
+2015/07/09 23:06:47 main.go:55: Valid JSON
+2015/07/09 23:06:47 main.go:59: ------------------
+2015/07/09 23:06:47 util.go:30: Opening: smallest_map.json
+2015/07/09 23:06:47 util.go:49:  File size: 3
+2015/07/09 23:06:47 main.go:92: Map
+2015/07/09 23:06:47 main.go:45: #######################
+2015/07/09 23:06:47 main.go:55: Valid JSON
+2015/07/09 23:06:47 main.go:59: ------------------
+1:24.24 3524
+$ 
 ```
-.
+
