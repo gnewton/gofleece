@@ -83,12 +83,12 @@ func parseJson(prefix []byte, jsonReader *bufio.Reader) error {
 		if VERBOSE {
 			log.Println("Array")
 		}
-		return isValidArray(jsonReader)
+		return decodeJsonArray(jsonReader)
 	} else {
 		if VERBOSE {
 			log.Println("Map")
 		}
-		return isValidMap(jsonReader)
+		return decodeJsonMap(jsonReader)
 	}
 }
 
@@ -107,17 +107,18 @@ func isValidJson(r *bufio.Reader) error {
 
 	}
 	if jsonHasLeadingSquareBrace(string(prefix)) {
-		err = isValidArray(r)
+		err = decodeJsonArray(r)
 	} else {
-		err = isValidMap(r)
+		err = decodeJsonMap(r)
 	}
 	if err == io.EOF {
-		err = nil
+		return nil
+	} else {
+		return err
 	}
-	return err
 }
 
-func isValidMap(r *bufio.Reader) error {
+func decodeJsonMap(r *bufio.Reader) error {
 	var mp map[string]interface{}
 	mp = nil
 
@@ -139,7 +140,7 @@ func isValidMap(r *bufio.Reader) error {
 	return nil
 }
 
-func isValidArray(r *bufio.Reader) error {
+func decodeJsonArray(r *bufio.Reader) error {
 	var mp []map[string]interface{}
 	mp = nil
 
