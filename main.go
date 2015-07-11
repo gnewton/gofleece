@@ -19,11 +19,13 @@ func handleParameters() error {
 }
 
 var STOP_ON_ERROR bool = false
+var ZERO_LENGTH_FILE_IS_VALID bool = false
 var VERBOSE bool = false
 
 func init() {
 	flag.BoolVar(&STOP_ON_ERROR, "s", STOP_ON_ERROR, "Stop if error encountered")
 	flag.BoolVar(&VERBOSE, "v", VERBOSE, "Verbosity of logging")
+	flag.BoolVar(&ZERO_LENGTH_FILE_IS_VALID, "z", ZERO_LENGTH_FILE_IS_VALID, "Acccept a file of zero length as being valid JSON")
 }
 
 func main() {
@@ -61,7 +63,9 @@ func main() {
 func verifyJson(fileName string) error {
 	jsonStream, err := genericReader(fileName)
 	if err != nil {
-		log.Println(err)
+		if err == ErrZeroLengthFile && ZERO_LENGTH_FILE_IS_VALID {
+			return nil
+		}
 		return err
 	}
 
@@ -69,7 +73,6 @@ func verifyJson(fileName string) error {
 	if err != nil {
 		if err != bufio.ErrBufferFull && err != io.EOF {
 			log.Println(err)
-			log.Println("FFFF")
 			return err
 		}
 

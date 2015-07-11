@@ -15,6 +15,8 @@ import (
 const GZIP_SUFFIX = ".gz"
 const BZIP2_SUFFIX = ".bz2"
 
+var ErrZeroLengthFile = errors.New("File has zero length")
+
 func genericReader(fileName string) (*bufio.Reader, error) {
 	var reader io.Reader
 	var err error = nil
@@ -42,7 +44,7 @@ func genericReader(fileName string) (*bufio.Reader, error) {
 		}
 
 		if fileInfo.Size() == 0 {
-			return nil, errors.New("File is size 0 bytes")
+			return nil, ErrZeroLengthFile
 		}
 
 		if VERBOSE {
