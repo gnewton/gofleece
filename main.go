@@ -3,6 +3,7 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"runtime"
 	//"fmt"
 	"bufio"
@@ -21,21 +22,24 @@ func handleParameters() error {
 var STOP_ON_ERROR bool = false
 var ZERO_LENGTH_FILE_IS_VALID bool = false
 var VERBOSE bool = false
+var SILENT bool = false
 
 func init() {
-	flag.BoolVar(&STOP_ON_ERROR, "s", STOP_ON_ERROR, "Stop if error encountered")
+	flag.BoolVar(&STOP_ON_ERROR, "e", STOP_ON_ERROR, "Stop if error encountered")
+	flag.BoolVar(&SILENT, "s", SILENT, "Do not produce any output")
 	flag.BoolVar(&VERBOSE, "v", VERBOSE, "Verbosity of logging")
 	flag.BoolVar(&ZERO_LENGTH_FILE_IS_VALID, "z", ZERO_LENGTH_FILE_IS_VALID, "Acccept a file of zero length as being valid JSON")
 }
 
 func main() {
+	var finalErr error = nil
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	var fileNames = []string{""}
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	err := handleParameters()
 	if err != nil {
 		flag.Usage()
-		log.Fatal(err)
+		fatal(err)
 	}
 
 	if len(flag.Args()) != 0 {
@@ -45,18 +49,19 @@ func main() {
 	for _, fileName := range fileNames {
 		err = verifyJson(fileName)
 		if err != nil {
-			log.Println(err)
+			logg("###ERROR \"" + fileName + "\": NOT valid JSON")
+			logg(err)
+			finalErr = err
 			if STOP_ON_ERROR {
-				log.Fatal()
+				fatal(err)
 			}
 		} else {
-			if VERBOSE {
-				log.Println("Valid JSON")
-			}
+			logv("Valid JSON")
 		}
-		if VERBOSE {
-			log.Println("------------------")
-		}
+		logv("------------------")
+	}
+	if finalErr != nil {
+		fatal(nil)
 	}
 }
 
@@ -72,7 +77,7 @@ func verifyJson(fileName string) error {
 	prefix, err := jsonStream.Peek(128)
 	if err != nil {
 		if err != bufio.ErrBufferFull && err != io.EOF {
-			log.Println(err)
+			logg(err)
 			return err
 		}
 
@@ -84,12 +89,12 @@ func verifyJson(fileName string) error {
 func parseJson(prefix []byte, jsonReader *bufio.Reader) error {
 	if jsonHasLeadingSquareBrace(string(prefix)) {
 		if VERBOSE {
-			log.Println("Array")
+			logg("Array")
 		}
 		return decodeJsonArray(jsonReader)
 	} else {
 		if VERBOSE {
-			log.Println("Map")
+			logg("Map")
 		}
 		return decodeJsonMap(jsonReader)
 	}
@@ -103,8 +108,7 @@ func isValidJson(r *bufio.Reader) error {
 	prefix, err = r.Peek(128)
 	if err != nil {
 		if err != bufio.ErrBufferFull && err != io.EOF {
-			log.Println("Error testing isValidJson")
-			log.Println(err)
+			logg(err)
 			return err
 		}
 
@@ -171,4 +175,24 @@ func jsonHasLeadingSquareBrace(s string) bool {
 		return true
 	}
 	return false
+}
+
+func fatal(err error) {
+	if SILENT || err == nil {
+		os.Exit(1)
+	} else {
+		log.Fatal(err)
+	}
+}
+
+func logg(s ...interface{}) {
+	if !SILENT && s != nil && len(s) > 0 {
+		log.Println(s[0])
+	}
+}
+
+func logv(s ...interface{}) {
+	if VERBOSE {
+		logg(s)
+	}
 }

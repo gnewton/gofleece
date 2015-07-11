@@ -23,23 +23,22 @@ func genericReader(fileName string) (*bufio.Reader, error) {
 	var f *os.File = nil
 
 	if fileName == "" {
-		if VERBOSE {
-			log.Println("Reading from stdin")
-		}
+
+		logv("Reading from stdin")
+
 		return bufio.NewReader(os.Stdin), nil
 	} else {
-		if VERBOSE {
-			log.Println("Opening: " + fileName)
-		}
+		logv("Opening: " + fileName)
+
 		f, err = os.Open(fileName)
 		if err != nil {
-			log.Println(err)
+			logg(err)
 			return nil, err
 		}
 
 		fileInfo, err := f.Stat()
 		if err != nil {
-			log.Println(err)
+			logg(err)
 			return nil, err
 		}
 
@@ -47,9 +46,7 @@ func genericReader(fileName string) (*bufio.Reader, error) {
 			return nil, ErrZeroLengthFile
 		}
 
-		if VERBOSE {
-			log.Println(" File size: " + strconv.FormatInt(fileInfo.Size(), 10))
-		}
+		logv(" File size: " + strconv.FormatInt(fileInfo.Size(), 10))
 
 		if strings.HasSuffix(fileName, GZIP_SUFFIX) {
 			reader, err = gzip.NewReader(f)
