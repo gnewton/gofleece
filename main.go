@@ -130,7 +130,6 @@ func decodeJsonMap(r *bufio.Reader) error {
 	mp = nil
 
 	dec := json.NewDecoder(r)
-	dec.UseNumber()
 
 	for {
 		if err := dec.Decode(&mp); err == io.EOF {
@@ -152,7 +151,6 @@ func decodeJsonArray(r *bufio.Reader) error {
 	mp = nil
 
 	dec := json.NewDecoder(r)
-	dec.UseNumber()
 
 	for {
 		if err := dec.Decode(&mp); err == io.EOF {
