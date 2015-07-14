@@ -18,7 +18,7 @@ Usage of ./gofleece:
 
 
 ## Limitations/dependencies
-`gofleece` is basically a wrapper around `encoding/json`, so its interpretation of what is json is what [`encoding/json`][https://golang.org/pkg/encoding/json/] believes it to be.
+`gofleece` is basically a wrapper around `encoding/json`, so its interpretation of what is json is what [`encoding/json`](https://golang.org/pkg/encoding/json/) believes it to be.
 
 ## TODO
 * Presently single threaded: goroutine per file to be validated (limit to max cores; make # routines configuratble)
