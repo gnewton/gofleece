@@ -16,6 +16,10 @@ Usage of ./gofleece:
 * Handles very large json files with minumal overhead
 * Tested with 2GB JSON file, 9MB virtual, 3.6MB resident.
 
+
+## Limitations/dependencies
+`gofleece` is basically a wrapper around `encoding/json`, so its interpretation of what is json is what [`encoding/json`][https://golang.org/pkg/encoding/json/] believes it to be.
+
 ## TODO
 * Presently single threaded: goroutine per file to be validated (limit to max cores; make # routines configuratble)
 
@@ -50,4 +54,16 @@ $ /usr/bin/time -f "%E %M" ./gofleece -v *.json
 1:24.24 3524
 $ 
 ```
+
+## Example 2
+```
+$ ./gofleece -s *.json 
+$ echo $?
+0
+$ ./gofleece -s main.go
+$ echo $?
+1
+$
+```
+
 
