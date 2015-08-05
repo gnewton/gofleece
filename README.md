@@ -3,8 +3,10 @@ Command line json validator
 
 ```
 Usage of ./gofleece:
-  -s=false: Stop if error encountered
+  -e=false: Stop if error encountered
+  -s=false: Do not produce any output
   -v=false: Verbosity of logging
+  -z=false: Acccept a file of zero length as being valid JSON
   ```
 
 ## Features
@@ -15,7 +17,7 @@ Usage of ./gofleece:
 * Default: does not stop when a json file fails
 * Handles very large json files with minumal overhead
 * Tested with 2GB JSON file, 9MB virtual, 3.6MB resident.
-
+* Properly sets shell error code
 
 ## Limitations/dependencies
 `gofleece` is basically a wrapper around `encoding/json`, so its interpretation of what is json is what [`encoding/json`](https://golang.org/pkg/encoding/json/) believes it to be.
@@ -67,3 +69,9 @@ $
 ```
 
 
+# License
+GPV v2
+
+Copright (C) 2015 Glen Newton
+
+See LICENSE
